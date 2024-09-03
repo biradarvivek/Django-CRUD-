@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponseRedirect
 from .forms import StudentRegistration
 from .models import User
 # Create your views here.
@@ -16,6 +16,29 @@ def dashboard(request):
             fm = StudentRegistration()
     else:
         fm = StudentRegistration()
-        stud = User.objects.all()
+
+    stud = User.objects.all()
 
     return render(request, 'enroll/dashboard.html', {'form': fm, 'stu': stud})
+
+
+def update_data(request, id):
+    if request.method == 'POST':
+        pi = User.objects.get(pk=id)
+        fm = StudentRegistration(request.POST, instance=pi)
+        if fm.is_valid():
+            fm.save()
+            return HttpResponseRedirect('/')
+
+    else:
+        pi = User.objects.get(pk=id)
+        fm = StudentRegistration(instance=pi)
+
+    return render(request, 'enroll/updateStudent.html', {'form': fm})
+
+
+def delete_data(request, id):
+    if request.method == 'POST':
+        pi = User.objects.get(pk=id)
+        pi.delete()
+        return HttpResponseRedirect('/')
